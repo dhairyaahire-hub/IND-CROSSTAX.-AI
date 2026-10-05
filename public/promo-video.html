@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IND CROSSTAX AI — Official B2B Video Pitch & Software Tutorial</title>
+  <meta name="description" content="Official B2B promotional video and tutorial walkthrough of IND CROSSTAX AI for Chartered Accountants, IT exporters, and corporate tax offices." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.02); }
+    }
+    .glow-bg {
+      animation: pulseGlow 6s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-red-500 selection:text-white">
+
+  <!-- Top Navigation / Branding -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center font-black text-white text-xs shadow-md">
+          IND
+        </div>
+        <div>
+          <span class="font-extrabold text-white text-base tracking-tight"><span class="text-amber-500">IND</span> CROSSTAX <span class="text-red-500">AI</span></span>
+          <span class="text-[10px] text-slate-400 block font-mono">B2B TAX AUTOMATION &bull; VIDEO PRESENTATION</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="/" target="_blank" class="text-xs font-bold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/80 transition flex items-center gap-1.5">
+          <span>Open Main App</span> &rarr;
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-8 space-y-6">
+
+    <!-- Header Pitch -->
+    <div class="text-center space-y-2 max-w-3xl mx-auto">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">
+        🎬 Client Video Presentation &amp; Tutorial
+      </span>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
+        Automate Cross-Border Tax, DTAA Relief &amp; Form 10F
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+        Watch this 90-second video walkthrough showing how Chartered Accountants, IT service exporters, and CFO desks turn weeks of complex transfer pricing audits into an instant 3-minute statutory dossier.
+      </p>
+    </div>
+
+    <!-- Standalone Video Player Box -->
+    <div class="relative bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+      <!-- 16:9 Video Canvas Stage -->
+      <div id="videoStage" class="relative aspect-video w-full bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 flex flex-col justify-between p-6 sm:p-10 select-none overflow-hidden">
+        <!-- Ambient Grid -->
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/15 via-red-500/10 to-transparent pointer-events-none glow-bg"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none"></div>
+
+        <!-- Top Video Overlay -->
+        <div class="relative z-10 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span id="sceneBadge" class="px-3 py-1 rounded-full text-[11px] font-bold bg-white/10 text-amber-300 border border-white/10 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+              SCENE 1 OF 5
+            </span>
+            <span id="sceneTag" class="text-[11px] font-mono text-slate-400 bg-black/40 px-2.5 py-1 rounded-lg hidden sm:inline-block">
+              PROBLEM: 20% TAX LEAKAGE
+            </span>
+          </div>
+
+          <div class="text-[11px] font-mono text-slate-400 bg-black/50 px-2 py-1 rounded">
+            IND CROSSTAX AI &bull; 4K UHD
+          </div>
+        </div>
+
+        <!-- Dynamic Scene Content Box -->
+        <div class="relative z-10 my-auto py-2">
+          <div class="max-w-xl mx-auto text-center space-y-4">
+            <h2 id="sceneTitle" class="text-xl sm:text-2xl font-black text-white tracking-tight">
+              The Multi-Million Dollar Tax Leakage
+            </h2>
+
+            <div id="sceneCard" class="bg-slate-900/90 border border-red-500/30 rounded-2xl p-5 text-left shadow-2xl backdrop-blur-md">
+              <!-- Content dynamically rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Synchronized Subtitles (CC) -->
+        <div class="relative z-10 max-w-3xl mx-auto w-full mb-2">
+          <div class="bg-black/85 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-center shadow-lg">
+            <p id="subtitlesText" class="text-xs sm:text-sm font-medium text-amber-200 leading-snug">
+              &ldquo;Are your cross-border IT clients losing 15% to 20% on overseas invoices to foreign withholding taxes?&rdquo;
+            </p>
+          </div>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="relative z-10 bg-slate-900/95 backdrop-blur-md border border-slate-800 rounded-2xl p-3 flex flex-col gap-2">
+          <!-- Progress Bar -->
+          <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div id="progressBar" class="h-full bg-gradient-to-r from-amber-500 to-red-600 w-0 transition-all duration-100 ease-linear rounded-full"></div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs text-slate-300 pt-1">
+            <div class="flex items-center gap-3">
+              <button id="playPauseBtn" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition shadow flex items-center gap-1.5 cursor-pointer">
+                <span id="playIcon">▶ Play Video</span>
+              </button>
+
+              <button id="voiceToggleBtn" class="px-3 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer flex items-center gap-1">
+                <span>🔊 Voiceover: <strong id="voiceStatus" class="text-amber-400">ON</strong></span>
+              </button>
+            </div>
+
+            <!-- Scene Selectors -->
+            <div class="flex items-center gap-1">
+              <button onclick="goToScene(0)" class="scene-btn px-2 py-1 rounded text-[11px] font-bold bg-amber-500 text-slate-950 font-black">1</button>
+              <button onclick="goToScene(1)" class="scene-btn px-2 py-1 rounded text-[11px] font-bold bg-slate-800 text-slate-400">2</button>
+              <button onclick="goToScene(2)" class="scene-btn px-2 py-1 rounded text-[11px] font-bold bg-slate-800 text-slate-400">3</button>
+              <button onclick="goToScene(3)" class="scene-btn px-2 py-1 rounded text-[11px] font-bold bg-slate-800 text-slate-400">4</button>
+              <button onclick="goToScene(4)" class="scene-btn px-2 py-1 rounded text-[11px] font-bold bg-slate-800 text-slate-400">5</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Personal Share Box (WhatsApp, Email, LinkedIn) -->
+    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>📲 Send This Video Link Personally to Clients &amp; CAs</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-1">
+            Send this clean video presentation directly via WhatsApp, Email, or LinkedIn in one click:
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <button id="copyVideoLinkBtn" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl border border-slate-700 transition cursor-pointer flex items-center gap-1.5">
+            <span>🔗 Copy Video Link</span>
+          </button>
+          <a id="whatsappShareBtn" href="#" target="_blank" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-1.5">
+            <span>💬 Send on WhatsApp</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Outreach Message Preview -->
+      <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono text-slate-300 leading-relaxed">
+        <span class="text-amber-400 font-bold block mb-1">Pre-formatted message sent with this video:</span>
+        &ldquo;Hi! Check out this 90-second video demo of IND CROSSTAX AI. It shows how software exporters &amp; CA firms calculate DTAA withholding relief and generate Form 10F &amp; Transfer Pricing Word dossiers in 3 minutes: <span id="currentVideoUrl" class="text-red-400 underline">https://ais-pre-pkq53dmoeozfih4gzay4w4-239492006750.asia-east1.run.app/promo-video.html</span>&rdquo;
+      </div>
+    </div>
+
+    <!-- Commercials & Scope for CA Offices -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+        <span class="text-amber-400 font-bold text-xs uppercase tracking-wider block">Service 1</span>
+        <h4 class="font-bold text-white text-sm">Form 10F &amp; No-PE Packs</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Statutory declarations required by foreign clients to eliminate 20% withholding tax on software exports.
+        </p>
+        <div class="text-xs font-bold text-amber-300 pt-1">Fee: ₹5,000 – ₹15,000 / filing</div>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+        <span class="text-indigo-400 font-bold text-xs uppercase tracking-wider block">Service 2</span>
+        <h4 class="font-bold text-white text-sm">Transfer Pricing Safe Harbour</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          OECD &amp; CBDT Chapter X arm's length profit markups (TNMM, Safe Harbour Rule 10TD).
+        </p>
+        <div class="text-xs font-bold text-indigo-300 pt-1">Fee: ₹25,000 – ₹60,000 / study</div>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+        <span class="text-emerald-400 font-bold text-xs uppercase tracking-wider block">Service 3</span>
+        <h4 class="font-bold text-white text-sm">Monthly CFO &amp; Tax Retainer</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Ongoing treaty verification for IT agencies, SaaS startups, and multinational contracts.
+        </p>
+        <div class="text-xs font-bold text-emerald-300 pt-1">Fee: ₹20,000 – ₹50,000 / mo</div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+    <p>IND CROSSTAX AI &bull; Independent Promotional Video Portal &bull; Free Live Access</p>
+  </footer>
+
+  <!-- Script for Interactive Video & Voiceover -->
+  <script>
+    const scenes = [
+      {
+        id: 1,
+        title: "The Multi-Million Dollar Tax Leakage",
+        tag: "PROBLEM: 20% TAX LEAKAGE",
+        voice: "Are your cross-border IT clients, SaaS exporters, or multinational companies losing 15 to 20 percent on overseas invoices to foreign withholding taxes? Every year, billions of dollars are trapped in unnecessary double taxation and aggressive transfer pricing audits.",
+        subtitles: "15%–20% of cross-border revenue is lost to withholding taxes and Transfer Pricing disputes.",
+        cardHtml: `
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <span class="text-red-400 font-bold text-xs">Revenue Leakage Alert</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-red-500/20 text-red-400">-20% WITHHOLDING TAX</span>
+          </div>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex items-center gap-2"><span class="text-red-400">✕</span> 20% standard withholding deducted on US, UK, and Singapore invoices</li>
+            <li class="flex items-center gap-2"><span class="text-red-400">✕</span> Complex Indian Chapter X & OECD TP documentation requirements</li>
+            <li class="flex items-center gap-2"><span class="text-red-400">✕</span> Costly non-compliance penalties & delayed Form 10F filings</li>
+          </ul>
+        `
+      },
+      {
+        id: 2,
+        title: "Meet IND CROSSTAX AI: The Solution",
+        tag: "SOLUTION: ENTERPRISE AUTOMATION",
+        voice: "Welcome to IND CROSSTAX AI — the next-generation tax automation platform built specifically for Chartered Accountants, corporate finance teams, IT exporters, and enterprise tax desks. We turn weeks of complex legal treaty research into an instant 3-minute audit-ready dossier.",
+        subtitles: "IND CROSSTAX AI: Real-time DTAA Double Tax Relief & OECD Transfer Pricing Benchmarking.",
+        cardHtml: `
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <span class="text-amber-400 font-bold text-xs">Automated DTAA & Chapter X Solution</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400">85+ GLOBAL TREATIES</span>
+          </div>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Covers 85+ Bilateral Treaties (US, UK, Singapore, UAE, Germany, Japan)</li>
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Compliant with Indian Section 92C Chapter X & OECD 2022 Guidelines</li>
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Automatic Withholding Tax Optimization from 20% down to 0%–10%</li>
+          </ul>
+        `
+      },
+      {
+        id: 3,
+        title: "Live Walkthrough: How the Platform Works",
+        tag: "STEP-BY-STEP TUTORIAL",
+        voice: "Using the platform takes just three simple steps. First, enter your contract details. Second, our engine analyzes exact bilateral DTAA treaty articles, assessing Permanent Establishment risk, FTS classification, and arm's length markups. Third, download a fully audit-ready Form 10F and No-PE Certificate in Microsoft Word with a single click.",
+        subtitles: "Step 1: Intake &rarr; Step 2: DTAA & TP Safe Harbour Benchmark &rarr; Step 3: 1-Click Form 10F Word Dossier.",
+        cardHtml: `
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <span class="text-indigo-300 font-bold text-xs">Interactive 3-Step Walkthrough</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300">LIVE DEMO</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700">
+              <span class="text-[10px] font-bold text-amber-400 block">1. Intake</span>
+              <p class="text-[11px] text-slate-300 mt-0.5">Contract & Country</p>
+            </div>
+            <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700">
+              <span class="text-[10px] font-bold text-emerald-400 block">2. Calculate</span>
+              <p class="text-[11px] text-slate-300 mt-0.5">DTAA Relief Rate</p>
+            </div>
+            <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700">
+              <span class="text-[10px] font-bold text-red-400 block">3. Export</span>
+              <p class="text-[11px] text-slate-300 mt-0.5">Word Form 10F</p>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: 4,
+        title: "Scope of Work & Big Revenue for CA Firms",
+        tag: "BENEFITS FOR CA FIRMS & OFFICES",
+        voice: "For CA firms and tax agencies, IND CROSSTAX AI is your ultimate revenue multiplier. Deliver high-margin cross-border tax advisory in minutes instead of weeks. Prepare Form 3CEB documentation and foreign vendor tax evaluations effortlessly, allowing your firm to charge 25,000 to 1,00,000 rupees per engagement.",
+        subtitles: "Turn 3-week audits into 3-minute deliverables. Charge ₹25k–₹1L per client engagement.",
+        cardHtml: `
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <span class="text-emerald-400 font-bold text-xs">CA Firm & Agency Revenue Scope</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400">HIGH-MARGIN SERVICE</span>
+          </div>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Expand firm services into international tax without hiring costly specialists</li>
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Deliver certified Form 10F & No-PE packs to foreign enterprise clients</li>
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Zero manual calculation errors with OECD & CBDT rule compliance</li>
+          </ul>
+        `
+      },
+      {
+        id: 5,
+        title: "Transform Your Cross-Border Tax Practice",
+        tag: "CALL TO ACTION: START TODAY",
+        voice: "Stop losing money to double taxation. Empower your clients and scale your accounting practice today with IND CROSSTAX AI. Try it now for free or get in touch with our team for agency onboarding.",
+        subtitles: "Start free today. Protect your overseas revenues with IND CROSSTAX AI.",
+        cardHtml: `
+          <div class="text-center space-y-3 py-2">
+            <h4 class="text-lg font-black text-white">Start Scaling Your Practice Today</h4>
+            <p class="text-xs text-slate-300">Join hundreds of Chartered Accountants, startup founders, and cross-border consultants saving millions in taxes.</p>
+            <a href="/" target="_blank" class="inline-block px-5 py-2 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-amber-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition">
+              Launch Free Platform Now &rarr;
+            </a>
+          </div>
+        `
+      }
+    ];
+
+    let currentSceneIdx = 0;
+    let isPlaying = false;
+    let voiceEnabled = true;
+    let timer = null;
+    let progress = 0;
+
+    const sceneBadge = document.getElementById('sceneBadge');
+    const sceneTag = document.getElementById('sceneTag');
+    const sceneTitle = document.getElementById('sceneTitle');
+    const sceneCard = document.getElementById('sceneCard');
+    const subtitlesText = document.getElementById('subtitlesText');
+    const progressBar = document.getElementById('progressBar');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playIcon = document.getElementById('playIcon');
+    const voiceToggleBtn = document.getElementById('voiceToggleBtn');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const sceneButtons = document.querySelectorAll('.scene-btn');
+
+    function renderScene(idx) {
+      const s = scenes[idx];
+      sceneBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> SCENE ${s.id} OF 5`;
+      sceneTag.innerText = s.tag;
+      sceneTitle.innerText = s.title;
+      sceneCard.innerHTML = s.cardHtml;
+      subtitlesText.innerHTML = `&ldquo;${s.subtitles}&rdquo;`;
+
+      sceneButtons.forEach((btn, i) => {
+        if (i === idx) {
+          btn.className = "scene-btn px-2 py-1 rounded text-[11px] font-bold bg-amber-500 text-slate-950 font-black";
+        } else {
+          btn.className = "scene-btn px-2 py-1 rounded text-[11px] font-bold bg-slate-800 text-slate-400";
+        }
+      });
+
+      if (voiceEnabled && isPlaying && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utt = new SpeechSynthesisUtterance(s.voice);
+        utt.rate = 1.05;
+        const voices = window.speechSynthesis.getVoices();
+        const v = voices.find(voice => voice.lang.startsWith('en') && (voice.name.includes('Natural') || voice.name.includes('Google') || voice.name.includes('India')));
+        if (v) utt.voice = v;
+        window.speechSynthesis.speak(utt);
+      }
+    }
+
+    function goToScene(idx) {
+      currentSceneIdx = idx;
+      progress = 0;
+      progressBar.style.width = '0%';
+      renderScene(currentSceneIdx);
+    }
+
+    function play() {
+      isPlaying = true;
+      playIcon.innerText = '⏸ Pause Video';
+      renderScene(currentSceneIdx);
+
+      const intervalMs = 100;
+      const durationSeconds = 16;
+      const step = 100 / ((durationSeconds * 1000) / intervalMs);
+
+      timer = setInterval(() => {
+        progress += step;
+        if (progress >= 100) {
+          progress = 0;
+          if (currentSceneIdx < scenes.length - 1) {
+            currentSceneIdx++;
+            renderScene(currentSceneIdx);
+          } else {
+            pause();
+            currentSceneIdx = 0;
+            return;
+          }
+        }
+        progressBar.style.width = `${progress}%`;
+      }, intervalMs);
+    }
+
+    function pause() {
+      isPlaying = false;
+      playIcon.innerText = '▶ Play Video';
+      if (timer) clearInterval(timer);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        pause();
+      } else {
+        play();
+      }
+    });
+
+    voiceToggleBtn.addEventListener('click', () => {
+      voiceEnabled = !voiceEnabled;
+      voiceStatus.innerText = voiceEnabled ? 'ON' : 'OFF';
+      voiceStatus.className = voiceEnabled ? 'text-amber-400' : 'text-slate-400';
+      if (!voiceEnabled && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      } else if (voiceEnabled && isPlaying) {
+        renderScene(currentSceneIdx);
+      }
+    });
+
+    // Share link configuration
+    const fullVideoUrl = window.location.href;
+    document.getElementById('currentVideoUrl').innerText = fullVideoUrl;
+
+    const copyBtn = document.getElementById('copyVideoLinkBtn');
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(fullVideoUrl);
+      copyBtn.innerText = '✓ Copied Video Link!';
+      setTimeout(() => {
+        copyBtn.innerText = '🔗 Copy Video Link';
+      }, 2500);
+    });
+
+    const whatsappBtn = document.getElementById('whatsappShareBtn');
+    const waText = encodeURIComponent(`Hi! Check out this 90-second video demo of IND CROSSTAX AI. It shows how software exporters & CA firms calculate DTAA withholding relief and generate Form 10F & Transfer Pricing Word dossiers in 3 minutes: ${fullVideoUrl}`);
+    whatsappBtn.href = `https://api.whatsapp.com/send?text=${waText}`;
+
+    // Initialize first scene
+    renderScene(0);
+  </script>
+</body>
+</html>

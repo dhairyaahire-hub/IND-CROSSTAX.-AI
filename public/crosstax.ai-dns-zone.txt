@@ -1,0 +1,3 @@
+crosstax.ai. 1 IN CNAME ais-pre-pkq53dmoeozfih4gzay4w4-239492006750.asia-east1.run.app.
+www.crosstax.ai. 1 IN CNAME ais-pre-pkq53dmoeozfih4gzay4w4-239492006750.asia-east1.run.app.
+crosstax.ai. 1 IN TXT "v=spf1 ~all"

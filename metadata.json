@@ -1,0 +1,6 @@
+{
+  "name": "GlobalTaxArm: AI DTAA & Transfer Pricing Advisor",
+  "description": "Enterprise-grade AI tax platform evaluating cross-border DTAA relief, calculating arm's length transfer pricing (OECD & Chapter X), and generating statutory compliance drafts & automated client reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

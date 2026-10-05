@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="100%" stop-color="#b91c1c" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="512" height="512" rx="112" fill="url(#redGrad)" />
+
+  <!-- Inner Subtle Accent Frame -->
+  <rect x="24" y="24" width="464" height="464" rx="92" fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.25" />
+
+  <!-- Central Emblem: Scale & Globe Axis -->
+  <g filter="url(#shadow)">
+    <!-- Scale Center Post -->
+    <path d="M256 128 L256 364" stroke="#ffffff" stroke-width="18" stroke-linecap="round" />
+    
+    <!-- Base -->
+    <path d="M192 376 L320 376" stroke="#ffffff" stroke-width="18" stroke-linecap="round" />
+    
+    <!-- Cross Beam -->
+    <path d="M136 172 L376 172" stroke="#ffffff" stroke-width="16" stroke-linecap="round" />
+    
+    <!-- Center Finial -->
+    <circle cx="256" cy="128" r="14" fill="#ffffff" />
+    
+    <!-- Left Scale Pan Strings & Pan -->
+    <path d="M136 172 L96 264 M136 172 L176 264" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-opacity="0.85" />
+    <path d="M84 264 Q136 296 188 264 Z" fill="#ffffff" />
+    
+    <!-- Right Scale Pan Strings & Pan -->
+    <path d="M376 172 L336 264 M376 172 L416 264" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-opacity="0.85" />
+    <path d="M324 264 Q376 296 428 264 Z" fill="#ffffff" />
+
+    <!-- Subtle Global Orbit Line -->
+    <ellipse cx="256" cy="272" rx="140" ry="46" fill="none" stroke="#ffffff" stroke-width="8" stroke-dasharray="14 12" stroke-opacity="0.45" />
+  </g>
+</svg>
