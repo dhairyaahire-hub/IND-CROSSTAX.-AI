@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Play, 
-  RotateCcw, 
   Share2, 
   Copy, 
   Check, 
-  ArrowRight, 
+  Download,
   ExternalLink, 
   Youtube, 
   Sparkles, 
   FileText, 
   ArrowLeft,
   ShieldCheck,
-  Calculator,
-  Scale,
   Clock,
   DollarSign,
   Briefcase,
@@ -21,7 +18,9 @@ import {
   Send,
   Link as LinkIcon,
   Settings,
-  ChevronRight
+  ChevronRight,
+  Video,
+  Film
 } from 'lucide-react';
 import { AnimatedIndianFlagLogo } from './AnimatedIndianFlagLogo';
 
@@ -30,8 +29,10 @@ interface StandaloneVideoPortalProps {
 }
 
 export const StandaloneVideoPortal: React.FC<StandaloneVideoPortalProps> = ({ onExitToApp }) => {
+  // Video player mode: 'mp4' (Native HTML5 MP4 player) or 'youtube' (Embedded YouTube player)
+  const [videoMode, setVideoMode] = useState<'mp4' | 'youtube'>('mp4');
+
   // Default YouTube Video ID (editable by user and saved to localStorage)
-  const defaultYouTubeId = 'dQw4w9WgXcQ'; // Fallback sample; user can configure their exact uploaded video
   const [youtubeVideoId, setYoutubeVideoId] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ind_crosstax_yt_video_id');
@@ -40,20 +41,40 @@ export const StandaloneVideoPortal: React.FC<StandaloneVideoPortalProps> = ({ on
       const paramId = urlParams.get('v') || urlParams.get('yt');
       if (paramId) return paramId;
     }
-    return 'LXb3EKWsInQ'; // High quality corporate demo video placeholder
+    return 'LXb3EKWsInQ';
   });
 
   const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
   const [customUrlInput, setCustomUrlInput] = useState<string>('');
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [copiedPitch, setCopiedPitch] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'video' | 'tutorial' | 'benefits' | 'share'>('video');
+  const [copiedYtTitle, setCopiedYtTitle] = useState<boolean>(false);
+  const [copiedYtDesc, setCopiedYtDesc] = useState<boolean>(false);
+  const [copiedYtTags, setCopiedYtTags] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'video' | 'download' | 'tutorial' | 'benefits' | 'share'>('video');
 
+  const mp4VideoUrl = '/ind-crosstax-ai-demo.mp4';
   const youtubeWatchUrl = `https://www.youtube.com/watch?v=${youtubeVideoId}`;
   const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${youtubeVideoId}?autoplay=1&rel=0&modestbranding=1`;
   const demoPublicUrl = typeof window !== 'undefined' 
     ? `${window.location.origin}/demo` 
     : 'https://ind-crosstax-ai.vercel.app/demo';
+
+  // YouTube Upload Assets
+  const ytVideoTitle = 'IND CROSSTAX AI — Cross-Border Tax, Bilateral DTAA Relief & Form 10F Walkthrough';
+  const ytVideoDesc = `Official client demonstration & software walkthrough for IND CROSSTAX AI.
+Automate bilateral Double Taxation Avoidance Agreements (DTAA), Indian Section 92C Chapter X Transfer Pricing, Safe Harbour Rule 10TD benchmarks, and instant 1-click Form 10F generation.
+
+🔗 Try Live Web Application: https://ind-crosstax-ai.vercel.app
+🎬 Dedicated Client Video Demo: https://ind-crosstax-ai.vercel.app/demo
+
+Key Platform Features:
+• Covers 85+ Bilateral Treaties (India to USA, UK, Singapore, UAE, Germany, Japan)
+• Reduces 20% domestic withholding tax to 0%–10%
+• Section 92C Safe Harbour Rule 10TD arm's length calculation (17%–24% margins)
+• Generates e-filing ready Form 10F, No-PE Certificates & Form 3CEB summaries in Word (.docx)`;
+
+  const ytVideoTags = 'dtaa, transfer pricing, form 10f, indian tax, cross-border tax, double tax relief, safe harbour rule 10td, ca tax software, b2b saas tax';
 
   // Helper to extract YouTube video ID from any standard URL
   const extractYouTubeId = (url: string): string => {
@@ -76,6 +97,7 @@ export const StandaloneVideoPortal: React.FC<StandaloneVideoPortalProps> = ({ on
       }
       setIsConfigModalOpen(false);
       setCustomUrlInput('');
+      setVideoMode('youtube');
     }
   };
 
@@ -95,8 +117,8 @@ export const StandaloneVideoPortal: React.FC<StandaloneVideoPortalProps> = ({ on
 Watch the official 2-minute video walkthrough here:
 ${demoPublicUrl}
 
-Direct YouTube Video:
-${youtubeWatchUrl}
+Direct Video Download (.MP4):
+${window.location.origin}${mp4VideoUrl}
 
 Key Highlights:
 1. Reclaim 15%–20% overseas withholding tax deductions under bilateral tax treaties.
@@ -116,7 +138,7 @@ Key Highlights:
 
   const handleShareWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hi! Take a look at this official video walkthrough for IND CROSSTAX AI — automating cross-border DTAA tax relief, Indian Transfer Pricing, and Form 10F compliance:\n\n${demoPublicUrl}\n\nWatch on YouTube: ${youtubeWatchUrl}`
+      `Hi! Take a look at this official video walkthrough for IND CROSSTAX AI — automating cross-border DTAA tax relief, Indian Transfer Pricing, and Form 10F compliance:\n\n${demoPublicUrl}\n\nDownload Video: ${window.location.origin}${mp4VideoUrl}`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
@@ -130,7 +152,7 @@ Key Highlights:
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white">
       {/* Top Header */}
-      <header className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 lg:px-8 py-3.5">
+      <header className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 lg:px-8 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 cursor-pointer" onClick={onExitToApp || (() => { window.location.href = '/'; })}>
             <AnimatedIndianFlagLogo size="sm" />
@@ -140,26 +162,26 @@ Key Highlights:
                   <span className="text-amber-500 font-black">IND</span> CROSSTAX <span className="text-red-500">AI</span>
                 </span>
                 <span className="px-2 py-0.5 text-[10px] font-bold bg-red-950/80 text-red-400 border border-red-800/60 rounded-full uppercase tracking-wider flex items-center gap-1">
-                  <Youtube className="w-3 h-3 text-red-500" />
-                  <span>Video Hub</span>
+                  <Film className="w-3 h-3 text-red-500" />
+                  <span>Video Hub &amp; Download</span>
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
-                Client Demonstration, Tutorial &amp; Business Benefits Guide
+                Client Demonstration, Tutorial &amp; Downloadable Video
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Direct MP4 Download Button in Header */}
             <a
-              href={youtubeWatchUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition shadow-sm"
-              title="Watch on YouTube"
+              href={mp4VideoUrl}
+              download="IND_CROSSTAX_AI_Tutorial_Demo.mp4"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-sm"
+              title="Download MP4 Video File"
             >
-              <Youtube className="w-4 h-4 fill-current" />
-              <span className="hidden sm:inline">Watch on</span> YouTube
+              <Download className="w-4 h-4" />
+              <span>Download .MP4</span>
             </a>
 
             <button
@@ -177,76 +199,154 @@ Key Highlights:
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
         
-        {/* Hero Title & Direct Client Action */}
+        {/* Hero Title & Download Highlights */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Official Video Tutorial &amp; Client Overview</span>
+            <span>Separate Video File Ready for Download &amp; YouTube Upload</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-            How IND CROSSTAX AI Protects Cross-Border Revenue &amp; Automates Form 10F
+            Official IND CROSSTAX AI Video Presentation &amp; Tutorial
           </h1>
 
           <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
-            A comprehensive, client-ready walkthrough showing how Chartered Accountants, corporate finance teams, and IT exporters eliminate 15%–20% overseas tax leakage and comply with Indian Chapter X &amp; OECD Transfer Pricing rules.
+            Download the official Full HD MP4 video file to upload to your YouTube channel or send directly to overseas clients, partners, and finance directors.
           </p>
 
-          {/* Quick Action Badges */}
+          {/* Download & Client Action Bar */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+            <a
+              href={mp4VideoUrl}
+              download="IND_CROSSTAX_AI_Tutorial_Demo.mp4"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-lg hover:scale-105 cursor-pointer"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download Video (.MP4 • 1080p)</span>
+            </a>
+
             <button
               type="button"
               onClick={handleCopyLink}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition cursor-pointer"
             >
               {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-              <span>{copiedLink ? 'Demo Link Copied!' : 'Copy Demo Link for Clients'}</span>
+              <span>{copiedLink ? 'Link Copied!' : 'Copy Client Demo Link'}</span>
             </button>
 
             <button
               type="button"
               onClick={handleShareWhatsApp}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-300 rounded-lg text-xs font-semibold transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs font-semibold transition cursor-pointer"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>Share via WhatsApp</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsConfigModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200 rounded-lg text-xs font-semibold transition cursor-pointer"
-              title="Update with your uploaded YouTube Video Link"
-            >
-              <Settings className="w-3.5 h-3.5" />
-              <span>Configure YouTube URL</span>
+              <span>WhatsApp Video Link</span>
             </button>
           </div>
         </div>
 
-        {/* 16:9 Video Player Card */}
+        {/* Video Mode Selector & 16:9 Video Player Card */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
+          {/* Player Mode Switcher */}
+          <div className="bg-slate-950 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-400">Player Format:</span>
+              <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setVideoMode('mp4')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                    videoMode === 'mp4' 
+                      ? 'bg-emerald-600 text-white shadow-xs' 
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Video className="w-3.5 h-3.5" />
+                  <span>Native MP4 Video (Direct File)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setVideoMode('youtube')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                    videoMode === 'youtube' 
+                      ? 'bg-red-600 text-white shadow-xs' 
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Youtube className="w-3.5 h-3.5" />
+                  <span>YouTube Player</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <a
+                href={mp4VideoUrl}
+                download="IND_CROSSTAX_AI_Tutorial_Demo.mp4"
+                className="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Save MP4 (839 KB)</span>
+              </a>
+
+              {videoMode === 'youtube' && (
+                <button
+                  type="button"
+                  onClick={() => setIsConfigModalOpen(true)}
+                  className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 ml-2"
+                >
+                  <Settings className="w-3 h-3" />
+                  <span>Edit YT Link</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 16:9 Video Display Stage */}
           <div className="relative aspect-video w-full bg-black">
-            <iframe
-              src={youtubeEmbedUrl}
-              title="IND CROSSTAX AI Video Tutorial"
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
+            {videoMode === 'mp4' ? (
+              <video
+                src={mp4VideoUrl}
+                controls
+                autoPlay
+                loop
+                playsInline
+                className="w-full h-full object-contain"
+              >
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <iframe
+                src={youtubeEmbedUrl}
+                title="IND CROSSTAX AI Video Tutorial"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            )}
           </div>
 
           {/* Under-Player Control & Quick Links Bar */}
           <div className="p-4 sm:p-5 bg-slate-900/90 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3 text-xs text-slate-300">
               <span className="flex h-2.5 w-2.5 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
               </span>
-              <span><strong>Video Ready:</strong> Client tutorial &amp; business value breakdown.</span>
+              <span><strong>File Ready:</strong> 1080p Full HD MP4 video file available for immediate download.</span>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap justify-end">
+              <a
+                href={mp4VideoUrl}
+                download="IND_CROSSTAX_AI_Tutorial_Demo.mp4"
+                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download Video File (.MP4)</span>
+              </a>
+
               <a
                 href={youtubeWatchUrl}
                 target="_blank"
@@ -254,7 +354,7 @@ Key Highlights:
                 className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5"
               >
                 <Youtube className="w-4 h-4 fill-current" />
-                <span>Open in YouTube App</span>
+                <span>Watch on YouTube</span>
                 <ExternalLink className="w-3 h-3 opacity-80" />
               </a>
 
@@ -264,7 +364,7 @@ Key Highlights:
                 className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer"
               >
                 {copiedPitch ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <FileText className="w-3.5 h-3.5 text-amber-400" />}
-                <span>{copiedPitch ? 'Pitch Template Copied!' : 'Copy Client Pitch Text'}</span>
+                <span>{copiedPitch ? 'Copied Pitch!' : 'Copy Client Pitch'}</span>
               </button>
             </div>
           </div>
@@ -272,6 +372,19 @@ Key Highlights:
 
         {/* Section Navigation Tabs */}
         <div className="flex border-b border-slate-800 gap-2 overflow-x-auto pb-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab('download')}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition whitespace-nowrap cursor-pointer flex items-center gap-2 ${
+              activeTab === 'download' || activeTab === 'video'
+                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+            }`}
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Download Video &amp; YouTube Upload Kit</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab('tutorial')}
@@ -290,7 +403,7 @@ Key Highlights:
             onClick={() => setActiveTab('benefits')}
             className={`px-4 py-2 text-xs font-bold rounded-lg transition whitespace-nowrap cursor-pointer flex items-center gap-2 ${
               activeTab === 'benefits'
-                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
             }`}
           >
@@ -303,18 +416,145 @@ Key Highlights:
             onClick={() => setActiveTab('share')}
             className={`px-4 py-2 text-xs font-bold rounded-lg transition whitespace-nowrap cursor-pointer flex items-center gap-2 ${
               activeTab === 'share'
-                ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30'
+                ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
             }`}
           >
             <Share2 className="w-3.5 h-3.5" />
-            <span>Client &amp; Customer Outreach Kit</span>
+            <span>Client Outreach Kit</span>
           </button>
         </div>
 
+        {/* TAB 0: Download & YouTube Upload Kit */}
+        {(activeTab === 'download' || activeTab === 'video') && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <Download className="w-4 h-4 text-emerald-400" />
+                    <span>Downloadable Video File (.MP4)</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Standalone video file ready for download, offline playback, client presentations, or uploading to YouTube.
+                  </p>
+                </div>
+
+                <a
+                  href={mp4VideoUrl}
+                  download="IND_CROSSTAX_AI_Tutorial_Demo.mp4"
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold transition flex items-center gap-2 shadow-md shrink-0"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download .MP4 (839 KB)</span>
+                </a>
+              </div>
+
+              {/* Video Specs Card */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-center">
+                  <div className="text-[10px] text-slate-500 uppercase font-mono">Format</div>
+                  <div className="text-xs font-bold text-white mt-0.5">MP4 (H.264 / AAC)</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-center">
+                  <div className="text-[10px] text-slate-500 uppercase font-mono">Resolution</div>
+                  <div className="text-xs font-bold text-white mt-0.5">1920x1080 Full HD</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-center">
+                  <div className="text-[10px] text-slate-500 uppercase font-mono">Audio Track</div>
+                  <div className="text-xs font-bold text-white mt-0.5">Harmonic Pad Audio</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-center">
+                  <div className="text-[10px] text-slate-500 uppercase font-mono">Language</div>
+                  <div className="text-xs font-bold text-white mt-0.5">100% English</div>
+                </div>
+              </div>
+            </div>
+
+            {/* YouTube Upload Kit */}
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-red-950/20 via-slate-900 to-slate-950 border border-red-900/30 space-y-4">
+              <div className="flex items-center gap-2">
+                <Youtube className="w-5 h-5 text-red-500" />
+                <h3 className="text-sm font-bold text-white">YouTube Upload Kit (Pre-Formatted Title, Description &amp; Tags)</h3>
+              </div>
+              <p className="text-xs text-slate-400">
+                When uploading the downloaded MP4 video to YouTube, copy and paste the pre-written metadata below for instant SEO optimization:
+              </p>
+
+              <div className="space-y-3">
+                {/* Title */}
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+                    <span className="font-semibold">Video Title:</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(ytVideoTitle);
+                        setCopiedYtTitle(true);
+                        setTimeout(() => setCopiedYtTitle(false), 2000);
+                      }}
+                      className="text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      {copiedYtTitle ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      <span>{copiedYtTitle ? 'Copied!' : 'Copy Title'}</span>
+                    </button>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono">
+                    {ytVideoTitle}
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+                    <span className="font-semibold">Video Description:</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(ytVideoDesc);
+                        setCopiedYtDesc(true);
+                        setTimeout(() => setCopiedYtDesc(false), 2000);
+                      }}
+                      className="text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      {copiedYtDesc ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      <span>{copiedYtDesc ? 'Copied!' : 'Copy Description'}</span>
+                    </button>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 font-mono whitespace-pre-wrap max-h-36 overflow-y-auto">
+                    {ytVideoDesc}
+                  </div>
+                </div>
+
+                {/* Tags */}
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+                    <span className="font-semibold">Search Tags / Keywords:</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(ytVideoTags);
+                        setCopiedYtTags(true);
+                        setTimeout(() => setCopiedYtTags(false), 2000);
+                      }}
+                      className="text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      {copiedYtTags ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      <span>{copiedYtTags ? 'Copied!' : 'Copy Tags'}</span>
+                    </button>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 font-mono">
+                    {ytVideoTags}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* TAB 1: Step-by-Step Tutorial */}
         {(activeTab === 'tutorial' || activeTab === 'video') && (
-          <div className="space-y-4">
+          <div className="space-y-4 pt-2">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-white">Step-by-Step Platform Tutorial</h3>
@@ -418,7 +658,7 @@ Key Highlights:
 
               <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start gap-3">
                 <div className="p-2.5 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shrink-0">
-                  <Scale className="w-5 h-5" />
+                  <Briefcase className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
                   <h4 className="text-xs font-bold text-white">Bank &amp; Indian Tax Department Accepted</h4>
