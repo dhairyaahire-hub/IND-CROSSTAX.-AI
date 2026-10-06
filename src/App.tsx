@@ -23,6 +23,7 @@ import { DnsSetupModal } from './components/DnsSetupModal';
 import { AdSenseBanner } from './components/AdSenseBanner';
 import { StandaloneVideoPortal } from './components/StandaloneVideoPortal';
 import { AnimatedIndianFlagLogo } from './components/AnimatedIndianFlagLogo';
+import { HowItWorksAndBenefits } from './components/HowItWorksAndBenefits';
 import { 
   Sparkles, 
   ShieldCheck, 
@@ -37,7 +38,8 @@ import {
   Shield,
   Star,
   Video,
-  Play
+  Play,
+  Check
 } from 'lucide-react';
 
 export default function App() {
@@ -52,6 +54,8 @@ export default function App() {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState<boolean>(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState<boolean>(false);
   const [isDnsOpen, setIsDnsOpen] = useState<boolean>(false);
+  const [copiedBannerLink, setCopiedBannerLink] = useState<boolean>(false);
+  const [copiedLiveLink, setCopiedLiveLink] = useState<boolean>(false);
 
   // Check if opened via dedicated demo or video link (e.g. /demo, /video, ?view=demo, ?view=video, #demo, #video)
   const checkIsDemoRoute = () => {
@@ -184,12 +188,20 @@ export default function App() {
               type="button"
               onClick={() => {
                 navigator.clipboard.writeText('https://ind-crosstax-ai.vercel.app/demo');
-                alert('Client video link copied: https://ind-crosstax-ai.vercel.app/demo');
+                setCopiedBannerLink(true);
+                setTimeout(() => setCopiedBannerLink(false), 2500);
               }}
-              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg font-bold transition text-xs cursor-pointer shadow-xs"
+              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg font-bold transition text-xs cursor-pointer shadow-xs flex items-center gap-1"
               title="Copy direct demo link for clients"
             >
-              Copy Client Link
+              {copiedBannerLink ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-emerald-400">Link Copied!</span>
+                </>
+              ) : (
+                <span>Copy Client Link</span>
+              )}
             </button>
           </div>
         </div>
@@ -287,7 +299,35 @@ export default function App() {
                 isLoading={isLoading}
               />
             )}
+
+            {/* Embedded Step-by-Step Process & Benefits Guide on Home Page */}
+            <div className="pt-8 border-t border-slate-200">
+              <HowItWorksAndBenefits
+                onStartEvaluation={(preset) => {
+                  if (preset) {
+                    runEvaluation(preset, 'dtaa');
+                  } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                onOpenDemo={handleOpenDemo}
+              />
+            </div>
           </div>
+        )}
+
+        {/* Dedicated Guide & Benefits Tab */}
+        {activeTab === 'guide' && (
+          <HowItWorksAndBenefits
+            onStartEvaluation={(preset) => {
+              if (preset) {
+                runEvaluation(preset, 'dtaa');
+              } else {
+                setActiveTab('intake');
+              }
+            }}
+            onOpenDemo={handleOpenDemo}
+          />
         )}
 
         {/* TAB 2: DTAA Relief Checker */}
@@ -426,11 +466,19 @@ export default function App() {
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.origin);
-                  alert('Free live link copied to clipboard!');
+                  setCopiedLiveLink(true);
+                  setTimeout(() => setCopiedLiveLink(false), 2500);
                 }}
                 className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[11px] transition cursor-pointer flex items-center gap-1"
               >
-                <span>🔗 Copy Free Live Link</span>
+                {copiedLiveLink ? (
+                  <>
+                    <Check className="w-3 h-3 text-emerald-600" />
+                    <span className="text-emerald-700 font-bold">Link Copied!</span>
+                  </>
+                ) : (
+                  <span>🔗 Copy Free Live Link</span>
+                )}
               </button>
               <button
                 onClick={() => setIsDnsOpen(true)}

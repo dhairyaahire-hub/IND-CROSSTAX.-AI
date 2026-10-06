@@ -431,9 +431,14 @@ Provide an exhaustive, professional tax assessment in JSON format with:
 // 2. Legal Compliance & Treaty Draft Generator
 app.post('/api/generate-draft', async (req: Request, res: Response) => {
   try {
-    const { draftType, contract, dtaa, transferPricing } = req.body;
-    const residentProfile = getCountryTPProfile(contract.residentCountry);
-    const sourceProfile = getCountryTPProfile(contract.sourceCountry);
+    const draftType = req.body.draftType || 'no_pe_certificate';
+    const contract = req.body.contract || req.body.report?.contract || {};
+    const dtaa = req.body.dtaa || req.body.report?.dtaa;
+    const transferPricing = req.body.transferPricing || req.body.report?.transferPricing;
+    const residentCountry = contract.residentCountry || 'IN';
+    const sourceCountry = contract.sourceCountry || 'US';
+    const residentProfile = getCountryTPProfile(residentCountry);
+    const sourceProfile = getCountryTPProfile(sourceCountry);
 
     const prompt = `
 You are a Senior International Tax Lawyer and Transfer Pricing Partner at Cross Tax AI. Draft a complete, official, legally binding document tailored specifically to the following client details:

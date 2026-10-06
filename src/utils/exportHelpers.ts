@@ -62,13 +62,7 @@ export function downloadWordDoc(filename: string, title: string, htmlBody: strin
  * Triggers direct Print-to-PDF with clean printable stylesheet
  */
 export function printToPdf(title: string, printableHtml: string) {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    alert('Please allow popups to open the printable PDF view.');
-    return;
-  }
-
-  printWindow.document.write(`
+  const fullHtml = `
     <!doctype html>
     <html>
       <head>
@@ -103,12 +97,49 @@ export function printToPdf(title: string, printableHtml: string) {
         </div>
       </body>
     </html>
-  `);
-  printWindow.document.close();
-  setTimeout(() => {
-    printWindow.focus();
-    printWindow.print();
-  }, 400);
+  `;
+
+  // First try window.open
+  let printWindow: Window | null = null;
+  try {
+    printWindow = window.open('', '_blank');
+  } catch {
+    printWindow = null;
+  }
+
+  if (printWindow) {
+    printWindow.document.write(fullHtml);
+    printWindow.document.close();
+    setTimeout(() => {
+      printWindow?.focus();
+      printWindow?.print();
+    }, 400);
+    return;
+  }
+
+  // Graceful fallback for sandboxed iframes: hidden iframe printing
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document || iframe.contentDocument;
+  if (doc) {
+    doc.open();
+    doc.write(fullHtml);
+    doc.close();
+    setTimeout(() => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }, 500);
+  }
 }
 
 /**
