@@ -445,6 +445,8 @@ Client & Contract Details:
 - Company / Individual Name: ${contract.clientName} (${contract.entityType})
 - Residence Jurisdiction: ${contract.residentCountry} (${residentProfile.countryName} - ${residentProfile.tpLawTitle})
 - Source / Customer Jurisdiction: ${contract.sourceCountry} (${sourceProfile.countryName} - ${sourceProfile.tpLawTitle})
+- Tax Identification Number (PAN/EIN/UEN/TRN): ${contract.taxIdNumber || 'Assigned'}
+- Fiscal / Tax Assessment Year: ${contract.fiscalYear || 'Current Accounting Year'}
 - Transaction: ${contract.transactionCategory} - "${contract.contractTitle}"
 - Annual Contract Sum: ${contract.currency} ${contract.annualValue.toLocaleString()}
 - Related Party / Associated Enterprise: ${contract.isPartOfSameGroup ? `Yes (${contract.relationshipNature || 'Related Subsidiary / Parent'})` : 'Independent Third Party'}
@@ -487,11 +489,11 @@ Output the document in clean, professional Markdown with formal legal headings, 
 ### Information to be furnished under sub-section (5) of section 90 or sub-section (5) of section 90A of the Income-tax Act, 1961
 
 1. **Name of the assessee**: ${contract.clientName}
-2. **Permanent Account Number (PAN) / Tax Identification Number**: ${contract.hasPANorTaxID ? 'FURNISHED' : 'NOT APPLICABLE / UNDER RULE 37BC'}
+2. **Permanent Account Number (PAN) / Tax Identification Number**: ${contract.taxIdNumber || (contract.hasPANorTaxID ? 'FURNISHED' : 'NOT APPLICABLE / UNDER RULE 37BC')}
 3. **Status**: ${contract.entityType === 'freelancer' ? 'Individual' : 'Company / Body Corporate'}
 4. **Country of incorporation / residence**: ${contract.residentCountry}
-5. **Assessee's tax identification number** in the country or specified territory of residence: ${contract.residentCountry}-TAX-${Date.now().toString(36).toUpperCase()}
-6. **Period for which the certificate of residence referred to in sub-section (4) of section 90 is applicable**: Current Assessment Year
+5. **Assessee's tax identification number** in the country or specified territory of residence: ${contract.taxIdNumber || `${contract.residentCountry}-TAX-${Date.now().toString(36).toUpperCase()}`}
+6. **Period for which the certificate of residence referred to in sub-section (4) of section 90 is applicable**: ${contract.fiscalYear || 'Current Assessment Year'}
 
 ---
 

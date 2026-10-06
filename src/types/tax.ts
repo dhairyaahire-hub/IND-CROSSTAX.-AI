@@ -39,6 +39,8 @@ export interface TaxContractInput {
   hasTRC: boolean; // Tax Residency Certificate
   hasForm10F: boolean;
   hasPANorTaxID: boolean;
+  taxIdNumber?: string; // Tax ID (PAN, EIN, UEN, TRN, etc.)
+  fiscalYear?: string;  // Fiscal / Accounting Year (e.g. FY 2025-26, CY 2026)
   notes?: string;
 }
 

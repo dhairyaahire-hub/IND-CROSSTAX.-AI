@@ -808,6 +808,8 @@ export const PRESET_CONTRACTS = [
       hasTRC: true,
       hasForm10F: true,
       hasPANorTaxID: true,
+      taxIdNumber: 'AAACU1234D',
+      fiscalYear: 'FY 2025-26',
       notes: 'Parent US entity reimburses costs plus 15%. Need transfer pricing arm length validation under IRC §482 and Chapter X.'
     }
   },
@@ -837,6 +839,8 @@ export const PRESET_CONTRACTS = [
       hasTRC: true,
       hasForm10F: true,
       hasPANorTaxID: true,
+      taxIdNumber: '201512345A',
+      fiscalYear: 'CY 2026',
       notes: 'Evaluating UAE corporate tax transfer pricing rules (Article 34 Connected Persons) and Singapore IRAS Section 34D.'
     }
   },
@@ -866,6 +870,8 @@ export const PRESET_CONTRACTS = [
       hasTRC: true,
       hasForm10F: false,
       hasPANorTaxID: true,
+      taxIdNumber: '12-3456789',
+      fiscalYear: 'CY 2026',
       notes: 'UK TIOPA transfer pricing study, Form W-8BEN-E, and HMRC DTTP exemption passport.'
     }
   },
@@ -895,6 +901,8 @@ export const PRESET_CONTRACTS = [
       hasTRC: true,
       hasForm10F: false,
       hasPANorTaxID: true,
+      taxIdNumber: 'DE123456789',
+      fiscalYear: 'CY 2026',
       notes: 'Under Australian Division 815 arm\'s length guidelines and German Foreign Tax Act §1 AStG.'
     }
   }

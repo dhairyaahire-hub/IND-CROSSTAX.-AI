@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   TaxContractInput, 
   EntityType, 
@@ -14,9 +14,23 @@ import {
   Clock, 
   ShieldAlert, 
   ArrowRight,
-  Info
+  Info,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Calendar,
+  CreditCard,
+  Check,
+  TrendingUp,
+  AlertCircle
 } from 'lucide-react';
 import { RealTimeCurrencyConverter } from './RealTimeCurrencyConverter';
+import { 
+  validateContractIntake, 
+  getTaxIdSpec, 
+  getFiscalYearSpec, 
+  ValidationIssue 
+} from '../utils/contractValidation';
 
 interface ContractIntakeFormProps {
   initialData: TaxContractInput;
@@ -29,20 +43,72 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
   onSubmit,
   isLoading
 }) => {
-  const [formData, setFormData] = useState<TaxContractInput>(initialData);
+  const [formData, setFormData] = useState<TaxContractInput>(() => ({
+    ...initialData,
+    taxIdNumber: initialData.taxIdNumber || (initialData.residentCountry === 'IN' ? 'AAACU1234D' : ''),
+    fiscalYear: initialData.fiscalYear || (initialData.residentCountry === 'IN' ? 'FY 2025-26' : 'CY 2026')
+  }));
+
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
 
   const handlePresetSelect = (presetData: TaxContractInput) => {
-    setFormData(presetData);
+    setFormData({
+      ...presetData,
+      taxIdNumber: presetData.taxIdNumber || (presetData.residentCountry === 'IN' ? 'AAACU1234D' : ''),
+      fiscalYear: presetData.fiscalYear || (presetData.residentCountry === 'IN' ? 'FY 2025-26' : 'CY 2026')
+    });
+    setTouchedFields({});
   };
 
   const handleChange = (field: keyof TaxContractInput, value: any) => {
-    setFormData((prev) => ({
+    setFormData((prev) => {
+      const next = {
+        ...prev,
+        [field]: value
+      };
+
+      // Auto-adapt default fiscal year & tax ID placeholder when resident country changes
+      if (field === 'residentCountry') {
+        const nextFYSpec = getFiscalYearSpec(value);
+        if (!next.fiscalYear || next.fiscalYear === 'FY 2025-26' || next.fiscalYear === 'CY 2026') {
+          next.fiscalYear = nextFYSpec.presets[0];
+        }
+      }
+
+      return next;
+    });
+
+    setTouchedFields((prev) => ({
       ...prev,
-      [field]: value
+      [field]: true
     }));
   };
 
+  // Real-time validation computation
+  const validation = useMemo(() => {
+    return validateContractIntake(formData);
+  }, [formData]);
+
+  const residentTaxIdSpec = useMemo(() => getTaxIdSpec(formData.residentCountry), [formData.residentCountry]);
+  const sourceTaxIdSpec = useMemo(() => getTaxIdSpec(formData.sourceCountry), [formData.sourceCountry]);
+  const residentFYSpec = useMemo(() => getFiscalYearSpec(formData.residentCountry), [formData.residentCountry]);
+
+  // Tax ID validation for resident entity
+  const taxIdVal = (formData.taxIdNumber || '').trim();
+  const isTaxIdValid = taxIdVal ? residentTaxIdSpec.validator(taxIdVal) : false;
+
+  // Fiscal year validation for resident entity
+  const fiscalYearVal = (formData.fiscalYear || '').trim();
+  const fiscalYearCheck = useMemo(() => {
+    return residentFYSpec.validator(fiscalYearVal);
+  }, [residentFYSpec, fiscalYearVal]);
+
   const currentTotalCost = (formData.directCostBase || 0) + (formData.indirectCostBase || 0);
+  const costExceedsValue = currentTotalCost > 0 && formData.annualValue > 0 && currentTotalCost > formData.annualValue;
+  const costMatchesValue = currentTotalCost > 0 && formData.annualValue > 0 && currentTotalCost === formData.annualValue;
+  const profitMargin = formData.annualValue > 0 && currentTotalCost > 0 
+    ? ((formData.annualValue - currentTotalCost) / currentTotalCost) * 100 
+    : 0;
 
   const handleApplyCurrencyValues = (newCurrency: string, newAnnualValue: number, newCostBase: number) => {
     const directRatio = currentTotalCost > 0 ? (formData.directCostBase || 0) / currentTotalCost : 0.8;
@@ -60,12 +126,15 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validation.isValid) {
+      return;
+    }
     onSubmit(formData);
   };
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      {/* Hero Header (White Card with Red Theme) */}
+      {/* Hero Header */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs">
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-bold mb-3">
@@ -108,18 +177,25 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Section 1: Entity & Corridor Origins (White Card) */}
+        {/* Section 1: Entity & Corridor Origins */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-            <Building2 className="w-5 h-5 text-red-600" />
-            <span>1. Enterprise Profile &amp; Jurisdictional Corridor</span>
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
+              <Building2 className="w-5 h-5 text-red-600" />
+              <span>1. Enterprise Profile &amp; Jurisdictional Corridor</span>
+            </div>
+            <div className="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full flex items-center gap-1">
+              <span>{formData.residentCountry}</span>
+              <span className="text-slate-400">&rarr;</span>
+              <span>{formData.sourceCountry}</span>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {/* Client / Business Name */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Client / Company Name
+                Client / Company Name <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -134,7 +210,7 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
             {/* Email for Automated Report Dispatch */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Email for Tax Structure Report
+                Email for Tax Structure Report <span className="text-red-600">*</span>
               </label>
               <input
                 type="email"
@@ -240,6 +316,141 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
               className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-red-500"
             />
           </div>
+
+          {/* REAL-TIME VALIDATION SUB-SECTION: Country-Specific Tax ID & Fiscal Year */}
+          <div className="pt-4 border-t border-slate-100 space-y-4 bg-slate-50/70 p-4 rounded-xl border">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-red-600" />
+                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Jurisdiction-Specific Tax ID &amp; Fiscal Period Alignment
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-500">
+                Validated against {residentTaxIdSpec.countryName} revenue guidelines
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Resident Tax ID Input */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                    <span>{residentTaxIdSpec.countryName} Tax ID ({residentTaxIdSpec.taxIdName})</span>
+                  </label>
+                  {/* Real-Time Format Status Badge */}
+                  {taxIdVal ? (
+                    isTaxIdValid ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                        <Check className="w-3 h-3 text-emerald-600" />
+                        <span>Valid {residentTaxIdSpec.taxIdName}</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full border border-red-300">
+                        <XCircle className="w-3 h-3 text-red-600" />
+                        <span>Format Error</span>
+                      </span>
+                    )
+                  ) : (
+                    <span className="text-[10px] text-slate-500 font-mono">
+                      e.g. {residentTaxIdSpec.example}
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.taxIdNumber || ''}
+                    onChange={(e) => {
+                      const val = residentTaxIdSpec.cleaner ? residentTaxIdSpec.cleaner(e.target.value) : e.target.value;
+                      handleChange('taxIdNumber', val);
+                    }}
+                    placeholder={residentTaxIdSpec.placeholder}
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 font-mono focus:outline-none transition-colors ${
+                      taxIdVal 
+                        ? isTaxIdValid 
+                          ? 'border-emerald-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500' 
+                          : 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                        : 'border-slate-300 focus:border-red-500'
+                    }`}
+                  />
+                </div>
+
+                <p className="text-[10px] text-slate-500 leading-relaxed">
+                  {residentTaxIdSpec.helpText}
+                </p>
+              </div>
+
+              {/* Fiscal Year Input & Country Presets */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Fiscal / Tax Assessment Period ({residentFYSpec.countryCode})</span>
+                  </label>
+                  {fiscalYearVal && fiscalYearCheck.isValid && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                      <Check className="w-3 h-3 text-emerald-600" />
+                      <span>Aligned</span>
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.fiscalYear || ''}
+                    onChange={(e) => handleChange('fiscalYear', e.target.value)}
+                    placeholder={residentFYSpec.presets[0]}
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 font-mono focus:outline-none transition-colors ${
+                      fiscalYearVal && !fiscalYearCheck.isValid
+                        ? 'border-amber-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
+                        : 'border-slate-300 focus:border-red-500'
+                    }`}
+                  />
+                </div>
+
+                {/* Country-Specific FY Presets */}
+                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                  <span className="text-[10px] text-slate-500">Quick select:</span>
+                  {residentFYSpec.presets.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => handleChange('fiscalYear', preset)}
+                      className={`text-[10px] px-2 py-0.5 rounded-md font-mono font-medium transition cursor-pointer ${
+                        formData.fiscalYear === preset
+                          ? 'bg-red-600 text-white font-bold'
+                          : 'bg-white border border-slate-300 text-slate-700 hover:border-red-300 hover:text-red-600'
+                      }`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Real-time warning or suggestion if user entered single year for India */}
+                {fiscalYearVal && !fiscalYearCheck.isValid && (
+                  <div className="p-2 rounded-lg bg-amber-50 border border-amber-300 text-[11px] text-amber-900 flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                      <span>{fiscalYearCheck.warning}</span>
+                    </div>
+                    {fiscalYearCheck.suggestion && (
+                      <button
+                        type="button"
+                        onClick={() => handleChange('fiscalYear', fiscalYearCheck.suggestion)}
+                        className="px-2 py-0.5 bg-amber-700 text-white text-[10px] font-bold rounded hover:bg-amber-800 transition whitespace-nowrap cursor-pointer shrink-0"
+                      >
+                        Use {fiscalYearCheck.suggestion}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Section 2: Financials & Transfer Pricing (White Card) */}
@@ -301,7 +512,7 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
               <select
                 value={formData.currency}
                 onChange={(e) => handleChange('currency', e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-red-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-red-500 font-mono font-medium"
               >
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
@@ -316,7 +527,7 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Annual Invoiced Value ({formData.currency})
+                Annual Invoiced Value ({formData.currency}) <span className="text-red-600">*</span>
               </label>
               <input
                 type="number"
@@ -325,7 +536,9 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
                 required
                 value={formData.annualValue}
                 onChange={(e) => handleChange('annualValue', Number(e.target.value))}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-red-500 font-mono font-medium"
+                className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 font-mono font-medium focus:outline-none ${
+                  formData.annualValue <= 0 ? 'border-red-500' : 'border-slate-300 focus:border-red-500'
+                }`}
               />
             </div>
 
@@ -360,11 +573,80 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
             </div>
           </div>
 
+          {/* Real-Time Cost & Margin Assessment Bar */}
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div>
+                <span className="text-slate-500 block text-[10px]">Total Cost Base:</span>
+                <span className="font-mono font-bold text-slate-900">
+                  {formData.currency} {currentTotalCost.toLocaleString()}
+                </span>
+              </div>
+              <div className="h-4 w-px bg-slate-300 hidden sm:block" />
+              <div>
+                <span className="text-slate-500 block text-[10px]">Operating Profit:</span>
+                <span className={`font-mono font-bold ${
+                  formData.annualValue - currentTotalCost >= 0 ? 'text-emerald-700' : 'text-red-600'
+                }`}>
+                  {formData.currency} {(formData.annualValue - currentTotalCost).toLocaleString()}
+                </span>
+              </div>
+              <div className="h-4 w-px bg-slate-300 hidden sm:block" />
+              <div>
+                <span className="text-slate-500 block text-[10px]">Realized Margin on Cost:</span>
+                <span className={`font-mono font-bold ${profitMargin >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
+                  {profitMargin.toFixed(1)}%
+                </span>
+              </div>
+            </div>
+
+            {/* Safe Harbour Compliance Badge */}
+            {formData.isPartOfSameGroup && (
+              <div>
+                {formData.residentCountry === 'IN' ? (
+                  formData.currentInvoicedMarginPct >= 17 ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      <Check className="w-3 h-3 text-emerald-600" />
+                      <span>Meets CBDT Rule 10TD Safe Harbour (&ge;17%)</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                      <AlertTriangle className="w-3 h-3 text-amber-600" />
+                      <span>Below CBDT Safe Harbour (17% min)</span>
+                    </span>
+                  )
+                ) : (
+                  formData.currentInvoicedMarginPct >= 5 ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      <Check className="w-3 h-3 text-emerald-600" />
+                      <span>OECD 5% Benchmark Satisfied</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                      <AlertTriangle className="w-3 h-3 text-amber-600" />
+                      <span>Below OECD 5% Cost Mark-Up</span>
+                    </span>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Real-time Loss Alert if costs exceed annual value */}
+          {costExceedsValue && (
+            <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-xs text-red-900 flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold">Severe Transfer Pricing Flag:</span> Total Cost Base ({formData.currency} {currentTotalCost.toLocaleString()}) exceeds Annual Invoiced Value ({formData.currency} {formData.annualValue.toLocaleString()}). Invoicing at an operating loss between related entities triggers automatic upward TP adjustments and potential 200% penalty under Section 270A.
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <label className="text-xs font-semibold text-slate-700">
-                  Current Invoiced Markup / Margin %
+                  Target Invoiced Markup / Margin %
                 </label>
                 <span className="text-xs font-mono font-bold text-red-600">
                   {formData.currentInvoicedMarginPct}%
@@ -404,7 +686,7 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
           </div>
         </div>
 
-        {/* Section 3: Permanent Establishment (PE) Nexus (White Card) */}
+        {/* Section 3: Permanent Establishment (PE) Nexus */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
           <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
             <ShieldAlert className="w-5 h-5 text-red-600" />
@@ -534,7 +816,7 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
           </div>
         </div>
 
-        {/* Section 4: Statutory Documentation (White Card) */}
+        {/* Section 4: Statutory Documentation */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
           <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
             <FileCheck2 className="w-5 h-5 text-red-600" />
@@ -595,7 +877,84 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
           </div>
         </div>
 
-        {/* Action Button (Red Gradient) */}
+        {/* PRE-SUBMISSION REAL-TIME VALIDATION SUMMARY PANEL */}
+        <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+          !validation.isValid
+            ? 'bg-red-50/80 border-red-300 shadow-sm'
+            : validation.warnings.length > 0
+            ? 'bg-amber-50/80 border-amber-300 shadow-sm'
+            : 'bg-emerald-50/80 border-emerald-300 shadow-sm'
+        }`}>
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                {!validation.isValid ? (
+                  <XCircle className="w-5 h-5 text-red-600 shrink-0" />
+                ) : validation.warnings.length > 0 ? (
+                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+                ) : (
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                )}
+                <h4 className="text-sm font-bold text-slate-900">
+                  {!validation.isValid
+                    ? `Action Required Before Submission (${validation.errors.length} Issue${validation.errors.length > 1 ? 's' : ''})`
+                    : validation.warnings.length > 0
+                    ? `Corridor Alignment Advisory (${validation.warnings.length} Recommendation${validation.warnings.length > 1 ? 's' : ''})`
+                    : `Statutory Corridors, Tax ID & Financials 100% Validated`}
+                </h4>
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {!validation.isValid
+                  ? 'Please resolve the following required fields to ensure your DTAA evaluation meets statutory filing standards:'
+                  : `All parameters align with ${residentTaxIdSpec.countryName} ↔ ${sourceTaxIdSpec.countryName} treaty protocols, tax ID standards, and accounting cycles.`}
+              </p>
+
+              {/* Blocking Errors List */}
+              {validation.errors.length > 0 && (
+                <ul className="mt-2 space-y-1 text-xs text-red-800 list-disc list-inside font-medium">
+                  {validation.errors.map((err, i) => (
+                    <li key={i}>
+                      <span>{err.message}</span>
+                      {err.suggestion && (
+                        <span className="text-slate-600 ml-1 font-normal">({err.suggestion})</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* Non-blocking warnings */}
+              {validation.isValid && validation.warnings.length > 0 && (
+                <ul className="mt-2 space-y-1 text-xs text-amber-800 list-disc list-inside font-medium">
+                  {validation.warnings.map((warn, i) => (
+                    <li key={i}>
+                      <span>{warn.message}</span>
+                      {warn.suggestion && (
+                        <span className="text-slate-600 ml-1 font-normal">Tip: {warn.suggestion}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Quick Status Pill */}
+            <div className="shrink-0 flex sm:flex-col items-end gap-1">
+              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider font-mono ${
+                !validation.isValid
+                  ? 'bg-red-200 text-red-900'
+                  : validation.warnings.length > 0
+                  ? 'bg-amber-200 text-amber-900'
+                  : 'bg-emerald-200 text-emerald-900'
+              }`}>
+                {!validation.isValid ? 'Incomplete' : 'Ready to Run'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Button */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-gradient-to-r from-red-50 via-white to-red-50 border border-red-200 rounded-2xl shadow-sm">
           <div>
             <div className="font-bold text-slate-900 text-sm">
@@ -608,13 +967,22 @@ export const ContractIntakeForm: React.FC<ContractIntakeFormProps> = ({
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-md shadow-red-600/20 transition-all disabled:opacity-50 cursor-pointer"
+            disabled={isLoading || !validation.isValid}
+            className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm shadow-md transition-all cursor-pointer ${
+              !validation.isValid
+                ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
+                : 'bg-red-600 hover:bg-red-700 text-white shadow-red-600/20 active:scale-98'
+            }`}
           >
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 <span>Evaluating DTAA &amp; Arm&apos;s Length Price...</span>
+              </>
+            ) : !validation.isValid ? (
+              <>
+                <AlertCircle className="w-4 h-4" />
+                <span>Resolve {validation.errors.length} Issue{validation.errors.length > 1 ? 's' : ''} to Proceed</span>
               </>
             ) : (
               <>
